@@ -127,6 +127,9 @@ function renderImages() {
                 <button onclick="copyImageUrl('${image.url}')" title="复制链接">
                     <i class="fas fa-copy"></i>
                 </button>
+                <button onclick="downloadImage('${image.url}', '${image.title}')" title="下载图片">
+                    <i class="fas fa-download"></i>
+                </button>
                 <button onclick="deleteImage(${image.id})" title="删除图片">
                     <i class="fas fa-trash"></i>
                 </button>
@@ -138,6 +141,7 @@ function renderImages() {
         </div>
     `).join('');
 }
+
 
 // 图片点击事件
 function handleImageClick(event, url) {
@@ -218,6 +222,32 @@ function validateImage(url) {
 function copyImageUrl(url) {
     navigator.clipboard.writeText(url).then(() => showToast('链接已复制')).catch(() => showToast('复制失败'));
 }
+// 下载
+function downloadImage(url, title) {
+    fetch(url, { mode: 'cors' }) // 尝试获取图片数据
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('图片无法下载');
+            }
+            return response.blob(); // 获取图片的 Blob 数据
+        })
+        .then(blob => {
+            const objectUrl = URL.createObjectURL(blob); // 创建一个临时的 Blob URL
+            const anchor = document.createElement('a');
+            anchor.href = objectUrl;
+            anchor.download = title || 'download'; // 指定下载的文件名
+            document.body.appendChild(anchor); // 添加到 DOM
+            anchor.click(); // 触发下载
+            document.body.removeChild(anchor); // 从 DOM 中移除
+            URL.revokeObjectURL(objectUrl); // 释放 Blob URL
+            showToast('图片下载成功');
+        })
+        .catch(() => {
+            showToast('图片无法下载');
+        });
+}
+
+
 
 // 删除图片
 let deleteImageId = null; // 用于存储待删除图片的 ID
