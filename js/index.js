@@ -193,15 +193,15 @@ async function handleAddImage(event) {
     showLoading(); // 显示加载动画
 
     try {
-        await validateImage(url); // 验证图片链接
         const newImage = { id: Date.now(), title, url };
         images.unshift(newImage);
         await updateFileContent(images);
         renderImages();
         hideAddModal();
         showToast('图片上传成功');
-    } catch {
-        showToast('图片链接无效');
+    } catch (error) {
+        console.error('Error adding image:', error);
+        showToast('图片上传失败');
     } finally {
         hideLoading(); // 隐藏加载动画
         submitButton.disabled = false; // 重新启用上传按钮
