@@ -227,7 +227,7 @@ function downloadImage(url, title) {
     fetch(url, { mode: 'cors' }) // 尝试获取图片数据
         .then(response => {
             if (!response.ok) {
-                throw new Error('图片无法下载');
+                throw new Error(`图片无法下载，获取失败，状态码: ${response.status}`);
             }
             return response.blob(); // 获取图片的 Blob 数据
         })
@@ -242,7 +242,8 @@ function downloadImage(url, title) {
             URL.revokeObjectURL(objectUrl); // 释放 Blob URL
             showToast('图片下载成功');
         })
-        .catch(() => {
+        .catch(error => {
+            console.error('下载图片时发生错误:', error);
             showToast('图片无法下载');
         });
 }
